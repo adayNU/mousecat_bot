@@ -28,17 +28,18 @@ class PlayMouseCat
   def self.calculate_move(mouse_location, cheese_location)
     move = {}
     if mouse_location[:x] - cheese_location[:x] > MIN_DISTANCE
-      move[:move] = :arrow_left
-      move[:distance] = (mouse_location[:x] - cheese_location[:x]).abs
+      move[:x_move] = :arrow_left
+      move[:x_distance] = (mouse_location[:x] - cheese_location[:x]).abs
     elsif mouse_location[:x] - cheese_location[:x] < -MIN_DISTANCE
-      move[:move] = :arrow_right
-      move[:distance] = (mouse_location[:x] - cheese_location[:x]).abs
-    elsif mouse_location[:y] - cheese_location[:y] < -MIN_DISTANCE
-      move[:move] = :arrow_down
-      move[:distance] = (mouse_location[:y] - cheese_location[:y]).abs
+      move[:x_move] = :arrow_right
+      move[:x_distance] = (mouse_location[:x] - cheese_location[:x]).abs
+    end
+    if mouse_location[:y] - cheese_location[:y] < -MIN_DISTANCE
+      move[:y_move] = :arrow_down
+      move[:y_distance] = (mouse_location[:y] - cheese_location[:y]).abs
     elsif mouse_location[:y] - cheese_location[:y] > MIN_DISTANCE
-      move[:move] = :arrow_up
-      move[:distance] = (mouse_location[:y] - cheese_location[:y]).abs
+      move[:y_move] = :arrow_up
+      move[:y_distance] = (mouse_location[:y] - cheese_location[:y]).abs
     end
     move
   end
@@ -52,7 +53,7 @@ class PlayMouseCat
 
     location = {:x => 0, :y => 0}
 
-    game_board = driver.find_element(:id => 'background')
+    game_board = driver.find_element(id: 'background')
     picture = ChunkyPNG::Image.from_string(driver.screenshot_as(:png))
 
     cheese_coordinates = find_objects(picture, CHEESE_COLORS.values.map{|e| e.sample(5)}.flatten)
@@ -63,7 +64,8 @@ class PlayMouseCat
     while !game_over?(driver) do
       current_cheese_target = cheese_coordinates.keys.first if !(cheese_coordinates.keys.include? current_cheese_target)
       next_move = calculate_move(mouse_coordinates.values.first, cheese_coordinates[current_cheese_target])
-      (next_move[:distance] / speed).to_i.times{game_board.send_keys(Array.new(20, next_move[:move]))}
+      (next_move[:x_distance].to_i / speed).to_i.times{game_board.send_keys(Array.new(20, next_move[:x_move]))}
+      (next_move[:y_distance].to_i / speed).to_i.times{game_board.send_keys(Array.new(20, next_move[:y_move]))}
 
       picture = ChunkyPNG::Image.from_string(driver.screenshot_as(:png))
       
