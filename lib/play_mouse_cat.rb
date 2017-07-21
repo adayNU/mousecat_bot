@@ -1,4 +1,3 @@
-require 'selenium-webdriver'
 require 'oily_png'
 
 class PlayMouseCat
@@ -44,15 +43,7 @@ class PlayMouseCat
     move
   end
 
-  def self.run(speed = 12.5)
-    driver = Selenium::WebDriver.for(:chrome)
-
-    driver.get(MOUSECAT_URL)
-
-    sleep(2)
-
-    location = {:x => 0, :y => 0}
-
+  def self.run(driver, speed = 12.5)
     game_board = driver.find_element(id: 'background')
     picture = ChunkyPNG::Image.from_string(driver.screenshot_as(:png))
 
@@ -81,7 +72,5 @@ class PlayMouseCat
     submit.click
 
     sleep(5)
-
-    driver.close
   end
 end
